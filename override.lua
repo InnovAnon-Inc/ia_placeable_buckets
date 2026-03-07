@@ -1,4 +1,4 @@
--- ia_bucket/override.lua
+-- ia_placeable_buckets/override.lua
 
 function ia_bucket.override_bucket_item(itemname)
 	--minetest.log('ia_bucket.override_bucket_item(itemname='..itemname..')')

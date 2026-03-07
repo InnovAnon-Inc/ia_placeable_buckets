@@ -1,4 +1,4 @@
--- ia_bucket/init.lua
+-- ia_placeable_buckets/init.lua
 
 	-- TODO is there a way to register with pipeworks so it's pumpable through tubes ?
 	-- pipeworks.liquids.<name>.source      = core.registered_nodes['mapgen_<name>_source'].name,

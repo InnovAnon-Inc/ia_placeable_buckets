@@ -1,4 +1,4 @@
--- ia_bucket/nodes.lua
+-- ia_placeable_buckets/nodes.lua
 
 function ia_bucket.register_bucket_node(itemname)
     --minetest.log('ia_bucket.register_bucket_node(itemname='..itemname..')')

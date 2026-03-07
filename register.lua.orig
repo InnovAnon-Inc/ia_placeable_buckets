@@ -1,4 +1,101 @@
--- ia_placeable_buckets/register.lua
+---- ia_bucket/register.lua
+--assert(minetest.get_modpath('bucket'))
+--assert(minetest.get_modpath('drinks')) -- stealing resources only: do not use api; we require this to be loaded after us: do not declare in mod.conf
+--
+---- bucket.register_liquid(source, flowing, itemname, inventory_image, name, groups, force_renew)
+--function ia_bucket.register_liquid(modname, color, alpha, source, flowing, itemname, inventory_image, name, groups, force_renew)
+--    assert(modname)
+--    assert(itemname)
+--    local source_name         = modname .. ':flowspec_' .. itemname .. '_source'
+--    local flowing_name        = modname .. ':flowspec_' .. itemname .. '_flowing'
+--    local bucket_name         = modname .. ':bucket_'   .. itemname
+--    local source_description  = name .. ' Source'
+--    local flowing_description = name .. ' Flowing'
+--    local bucket_description  = 'Bucket of ' .. name
+--    local source_image        = "default_water_source_animated.png^[colorize:"     .. color .. ":120" -- TODO alpha
+--    local flowing_image       = "default_water_flowing_animated.png^[colorize:"    .. color .. ":120" -- TODO alpha
+--    --local bucket_image        = 'bucket.png^(drinks_bucket_contents.png^[colorize:'.. color .. ':200)'
+--    local bucket_image        = 'bucket.png^(' .. '('..inventory_image..')' .. '^[colorize:'.. color .. ':200)' -- TODO alpha
+--
+--    assert(not minetest.registered_nodes[source_name])
+--    assert(not minetest.registered_nodes[flowing_name])
+--    assert(not minetest.registered_items[bucket_name])
+--
+--    -- TODO move to helper method ia_bucket.register_liquid_source
+--    minetest.register_node(source_name, { -- TODO copy & override water source def ?
+--        description                = source_description,
+--	drawtype                   = 'liquid',
+--	tiles                      = {
+--		{
+--			name      = source_image,
+--            		animation = {type = "vertical_frames", aspect_w = 16, aspect_h = 16, length = 2.0},
+--		},
+--	},
+--	special_tiles              = {
+--		{
+--			name             = source_image,
+--            		animation        = {type = "vertical_frames", aspect_w = 16, aspect_h = 16, length = 2.0},
+--                        backface_culling = false,
+--		},
+--	},
+--	alpha                      = 160,
+--    	paramtype                  = "light",
+--    	walkable                   = false,
+--    	pointable                  = false,
+--    	diggable                   = false,
+--    	buildable_to               = true,
+--    	drop                       = "",
+--    	drowning                   = 1,
+--    	liquidtype                 = "source",
+--    	liquid_alternative_flowing = flowing_name,
+--    	liquid_alternative_source  = source_name,
+--    	liquid_viscosity           = 1,
+--    	groups                     = {liquid = 3,}, -- TODO extend groups
+--    })
+--    
+--    -- TODO move to helper method: ia_bucket.register_liquid_flowing
+--    minetest.register_node(flowing_name, { -- TODO copy & override water flowing def ?
+--    	drawtype                   = "flowingliquid",
+--    	tiles                      = {
+--		flowing_image,
+--	},
+--	special_tiles              = {
+--		{
+--			name             = flowing_image,
+--            		animation        = {type = "vertical_frames", aspect_w = 16, aspect_h = 16, length = 0.8},
+--            		backface_culling = false,
+--		},
+--	},
+--	alpha                      = 160,
+--	paramtype                  = "light",
+--	walkable                   = false,
+--	pointable                  = false,
+--	diggable                   = false,
+--	buildable_to               = true,
+--	drop                       = "",
+--	drowning                   = 1,
+--	liquidtype                 = "flowing",
+--	liquid_alternative_flowing = flowing_name,
+--	liquid_alternative_source  = source_name,
+--	liquid_viscosity           = 1,
+--	groups                     = {liquid = 3, not_in_creative_inventory = 1}, -- TODO extend groups
+--    })
+--
+--    bucket.register_liquid(
+--	source_name,        -- source
+--	flowing_name,       -- flowing
+--	bucket_name,        -- itemname
+--	bucket_image,       -- inventory_image
+--	bucket_description, -- name
+--	groups,             -- groups
+--    )
+--
+--end
+--
+--function ia_bucket.register_liquid2(modname, color, alpha, name, inventory_image, groups)
+--	-- TODO
+--	ia_bucket.register_liquid(modname, color, alpha, ...)
+--end
 assert(minetest.get_modpath('bucket'))
 
 -- Helper to safely get base liquid properties from MTG
@@ -79,16 +176,10 @@ local function get_images(inventory_image, color, alpha)
     --local bright_template = "^[greyscale^[contrast:50^[brightness:50"
     --local source_image  = "(default_water_source_animated.png" .. bright_template .. ")" .. color_suffix
     --local flowing_image = "(default_water_flowing_animated.png" .. bright_template .. ")" .. color_suffix
-    --local bleach_modifier = "^[greyscale^[contrast:10^[brightness:70"
-    ----local bleach_modifier = "^[greyscale^[contrast:70^[brightness:10"
-    --local source_image  = "(default_water_source_animated.png" .. bleach_modifier .. ")" .. color_suffix
-    --local flowing_image = "(default_water_flowing_animated.png" .. bleach_modifier .. ")" .. color_suffix
-    local kill_blue = "^[brighten^[multiply:#ffffff"
-    local source_image  = "(default_water_source_animated.png" .. kill_blue .. ")" .. color_suffix
-    local flowing_image = "(default_water_flowing_animated.png" .. kill_blue .. ")" .. color_suffix
-    --local mask_logic = "^[greyscale^[contrast:20^[brightness:50"
-    --local source_image  = "(default_water_source_animated.png" .. mask_logic .. ")" .. color_suffix
-    --local flowing_image = "(default_water_flowing_animated.png" .. mask_logic .. ")" .. color_suffix
+    local bleach_modifier = "^[greyscale^[contrast:10^[brightness:70"
+    --local bleach_modifier = "^[greyscale^[contrast:70^[brightness:10"
+    local source_image  = "(default_water_source_animated.png" .. bleach_modifier .. ")" .. color_suffix
+    local flowing_image = "(default_water_flowing_animated.png" .. bleach_modifier .. ")" .. color_suffix
     --local bucket_image = 'bucket.png^(' .. '('..inventory_image..')' .. '^[colorize:'.. color .. ':'..alpha..')'
     local bucket_image  = 'bucket.png^(' .. '('..inventory_image..')' .. color_suffix..')'
     return {
