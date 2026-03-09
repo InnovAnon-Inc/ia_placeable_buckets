@@ -41,7 +41,7 @@ ia_bucket.buckets                = {
 	"bucket:bucket_lava",
 	"bucket:bucket_empty"
 }
---local modpath, S                 = ia_util.loadmod(modname)
+--local modpath, S                 = ia_util.loadmod(modname) -- FIXME
 local modpath = minetest.get_modpath(modname)
 dofile(modpath .. '/nodes.lua')
 dofile(modpath .. '/override.lua')

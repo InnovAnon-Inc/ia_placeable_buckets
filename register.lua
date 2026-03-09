@@ -137,9 +137,94 @@ function ia_bucket.register_liquid(modname, color, node_alpha, alpha, item_id, n
     assert(minetest.get_modpath('drinks')) -- NOTE do not declare in mod.conf
     
     -- standard naming conventions
-    local source_name     = modname .. ':flowspec_' .. item_id .. '_source'
-    local flowing_name    = modname .. ':flowspec_' .. item_id .. '_flowing'
+    --local source_name     = modname .. ':flowspec_' .. item_id .. '_source'
+    --local flowing_name    = modname .. ':flowspec_' .. item_id .. '_flowing'
+    local source_name     = modname .. ':' .. item_id .. '_source'
+    local flowing_name    = modname .. ':' .. item_id .. '_flowing'
     local bucket_name     = modname .. ':bucket_'   .. item_id
     local inventory_image = 'drinks_bucket_contents.png'
     ia_bucket.register_liquid0(source_name, flowing_name, bucket_name, color, node_alpha, alpha, inventory_image, name, groups)
+end
+
+
+
+
+
+
+
+
+function ia_bucket.get_on_use(satiates, quenches, return_item)
+    assert(satiates    ~= nil)
+    assert(quenches    ~= nil)
+    assert(return_item ~= nil)
+    local heals             = satiates
+    if minetest.get_modpath('thirsty')   then
+        return function(itemstack, user, pointed_thing)
+            thirsty.drink(user, quenches, 20)
+            local  eat_func = minetest.item_eat(heals, return_item)
+            return eat_func(itemstack, user, pointed_thing)
+        end
+    end
+    if minetest.get_modpath('hunger_ng') then
+        return function(itemstack, user, pointed_thing)
+            -- hunger_ng handles the actual restoration logic; 0 prevents vanilla healing
+            local  eat_func = minetest.item_eat(0,     return_item)
+            return eat_func(itemstack, user, pointed_thing)
+        end
+    end
+    -- vanilla
+    return function(itemstack, user, pointed_thing)
+        local      eat_func = minetest.item_eat(heals, return_item)
+        return     eat_func(itemstack, user, pointed_thing)
+    end
+end
+
+function ia_bucket.register_drink_vessel0(item_id, name, desc, inventory_image, return_item, multiplier)
+    assert(minetest.get_modpath('drinks'))
+    assert(item_id         ~= nil)
+    assert(name            ~= nil)
+    assert(desc            ~= nil)
+    assert(inventory_image ~= nil)
+    assert(return_item     ~= nil)
+    assert(multiplier      ~= nil)
+    local satiates = 2 * multiplier
+    local quenches = 3 * multiplier
+    local on_use   = ia_bucket.get_on_use(satiates, quenches, return_item)
+
+    drinks.register_item(item_id, return_item, {
+        description     = desc,
+        groups          = {drink = 1},
+        --juice_type = name,
+        inventory_image = inventory_image,
+        on_use          = on_use,
+    })
+
+    if minetest.get_modpath("hunger_ng") then
+        hunger_ng.add_hunger_data(item_id, {
+            satiates = satiates,
+            heals    = 0,
+            quenches = quenches,
+            returns  = return_item,
+        })
+    end
+end
+
+function ia_bucket.register_drink_vessels(modname, color, item_id, name)
+    assert(minetest.get_modpath('drinks'))
+    assert(modname ~= nil)
+    assert(color   ~= nil)
+    assert(item_id ~= nil)
+    assert(name    ~= nil)
+    local jcu_name        = modname..':jcu_'..item_id
+    local jbo_name        = modname..':jbo_'..item_id
+    local jsb_name        = modname..':jsb_'..item_id
+    local jcu_desc        = 'Cup of '              .. name .. ' Juice'
+    local jbo_desc        = 'Bottle of '           .. name .. ' Juice'
+    local jsb_desc        = 'Heavy Steel Bottle (' .. name .. ' Juice)'
+    local jcu_image       = 'drinks_glass_contents.png^[colorize:'  .. color .. ':200^drinks_drinking_glass.png'
+    local jbo_image       = 'drinks_bottle_contents.png^[colorize:' .. color .. ':200^drinks_glass_bottle.png'
+    local jsb_image       = 'vessels_steel_bottle.png'
+    ia_bucket.register_drink_vessel0(jcu_name, name, jcu_desc, jcu_image, 'vessels:drinking_glass', 1)
+    ia_bucket.register_drink_vessel0(jbo_name, name, jbo_desc, jbo_image, 'vessels:glass_bottle',   2)
+    ia_bucket.register_drink_vessel0(jsb_name, name, jsb_desc, jsb_image, 'vessels:steel_bottle',   2)
 end
