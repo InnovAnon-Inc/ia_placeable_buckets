@@ -193,7 +193,7 @@ function ia_bucket.register_drink_vessel0(item_id, name, desc, inventory_image, 
 
     drinks.register_item(item_id, return_item, {
         description     = desc,
-        groups          = {drink = 1},
+        groups          = {drink = 1}, -- h2o=3 for claycrafter
         --juice_type = name,
         inventory_image = inventory_image,
         on_use          = on_use,
