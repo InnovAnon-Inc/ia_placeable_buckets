@@ -1,7 +1,7 @@
 -- ia_placeable_buckets/nodes.lua
 
-function ia_bucket.register_bucket_node(itemname)
-    --minetest.log('ia_bucket.register_bucket_node(itemname='..itemname..')')
+function placeable_buckets.register_bucket_node(itemname)
+    --minetest.log('placeable_buckets.register_bucket_node(itemname='..itemname..')')
     assert(minetest.registered_nodes           ~= nil)
     assert(minetest.registered_nodes[itemname] == nil, itemname)
     local item_def = minetest.registered_items[itemname]
@@ -44,6 +44,6 @@ function ia_bucket.register_bucket_node(itemname)
     --log(3, "Converted " .. itemname .. " to a placeable node via table.copy")
 end
 
-for _, name in ipairs(ia_bucket.buckets) do
-	ia_bucket.register_bucket_node(name)
+for _, name in ipairs(placeable_buckets.buckets) do
+	placeable_buckets.register_bucket_node(name)
 end

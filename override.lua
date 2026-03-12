@@ -1,7 +1,7 @@
 -- ia_placeable_buckets/override.lua
 
-function ia_bucket.override_bucket_item(itemname)
-	--minetest.log('ia_bucket.override_bucket_item(itemname='..itemname..')')
+function placeable_buckets.override_bucket_item(itemname)
+	--minetest.log('placeable_buckets.override_bucket_item(itemname='..itemname..')')
 	assert(minetest.registered_items           ~= nil)
 	local original_def = minetest.registered_items[itemname]
 	assert(original_def                        ~= nil, itemname)
@@ -9,7 +9,7 @@ function ia_bucket.override_bucket_item(itemname)
 	--if not original_def then return end
 
 	-- Copy the original on_place (the pouring logic)
-	--local original_on_place = original_on_place or original_def.on_place -- FIXME 2026-03-07 12:58:28: WARNING[ServerStart]: Undeclared global variable "original_on_place" accessed at ...minetest/mods/ia_environment_meta/ia_bucket/override.lua:8
+	--local original_on_place = original_on_place or original_def.on_place -- FIXME 2026-03-07 12:58:28: WARNING[ServerStart]: Undeclared global variable "original_on_place" accessed at ...minetest/mods/ia_environment_meta/placeable_buckets/override.lua:8
 	local original_on_place = original_def.on_place
 
 	minetest.override_item(itemname, {
@@ -38,6 +38,3 @@ function ia_bucket.override_bucket_item(itemname)
 	})
 end
 
-for _, name in ipairs(ia_bucket.buckets) do
-	ia_bucket.override_bucket_item(name)
-end
