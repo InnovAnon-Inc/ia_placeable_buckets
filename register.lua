@@ -112,6 +112,7 @@ local function get_images(inventory_image, color, alpha, bucket_image_suffix)
     --local source_image  = "(default_water_source_animated.png" .. mask_logic .. ")" .. color_suffix
     --local flowing_image = "(default_water_flowing_animated.png" .. mask_logic .. ")" .. color_suffix
     --local bucket_image = 'bucket.png^(' .. '('..inventory_image..')' .. '^[colorize:'.. color .. ':'..alpha..')'
+    --snowcone_bucket.png, snowcone_bucket_syrup.png
     local bucket_image  = 'bucket.png^(' .. '('..inventory_image..')' .. color_suffix..')'
     if bucket_image_suffix and bucket_image_suffix ~= '' then
     bucket_image        = bucket_image .. '^('..bucket_image_suffix..')'
@@ -151,11 +152,14 @@ function placeable_buckets.register_liquid0(source_name, flowing_name, bucket_na
     placeable_buckets.register_liquid_source (source_name,  name .. " Source",  source_image,  flowing_name, groups, node_alpha, base_name_source)
     placeable_buckets.register_liquid_flowing(flowing_name, name .. " Flowing", flowing_image, source_name,  groups, node_alpha, base_name_flowing)
 
-    placeable_buckets.register_liquid1(source_name, flowing_name, bucket_name, color, node_alpha, alpha, inventory_image, name, groups, bucket_image_suffix, '')
+    --placeable_buckets.register_liquid1(bucket.register_liquid, source_name, flowing_name, bucket_name, color, node_alpha, alpha, inventory_image, name, groups, bucket_image_suffix, '')
+    placeable_buckets.register_liquid1(source_name, flowing_name, bucket_name, color, node_alpha, alpha, inventory_image, name, groups, bucket_image_suffix)
 end
 
-function placeable_buckets.register_liquid1(source_name, flowing_name, bucket_name, color, node_alpha, alpha, inventory_image, name, groups, bucket_image_suffix, name_prefix)
-    --minetest.log('placeable_buckets.register_liquid0(source_name='..source_name..', flowing_name='..flowing_name..', bucket_name='..bucket_name..', name='..name..')')
+--function placeable_buckets.register_liquid1(source_name, flowing_name, bucket_name, color, node_alpha, alpha, inventory_image, name, groups, bucket_image_suffix, name_prefix)
+function placeable_buckets.register_liquid1(source_name, flowing_name, bucket_name, color, node_alpha, alpha, inventory_image, name, groups, bucket_image_suffix)
+    minetest.log('placeable_buckets.register_liquid1(source_name='..source_name..', flowing_name='..flowing_name..', bucket_name='..bucket_name..', name='..name..', inventory_image='..inventory_image..', bucket_image_suffix='..bucket_image_suffix..')')
+    --assert(api ~= nil)
     assert(source_name ~= nil)
     assert(flowing_name ~= nil)
     assert(bucket_name ~= nil)
@@ -166,7 +170,8 @@ function placeable_buckets.register_liquid1(source_name, flowing_name, bucket_na
     assert(name ~= nil)
     assert(groups ~= nil)
     assert(bucket_image_suffix ~= nil)
-    assert(name_prefix ~= nil)
+    --assert(name_prefix ~= nil)
+    local name_prefix   = ''
     alpha               = alpha      or node_alpha
     node_alpha          = node_alpha or alpha
     assert((alpha == nil and node_alpha == nil) or (alpha >= node_alpha), 'bucket liquid should be more opaque than source/flowing liquid')
@@ -176,6 +181,7 @@ function placeable_buckets.register_liquid1(source_name, flowing_name, bucket_na
     local bucket_image  = images.bucket_image
     -- 3. Register via MTG Bucket API
     bucket.register_liquid(
+    --api(
         source_name,
         flowing_name,
         bucket_name,
@@ -187,13 +193,55 @@ function placeable_buckets.register_liquid1(source_name, flowing_name, bucket_na
     -- 4. Automatic Node-ification
     placeable_buckets.register_bucket_node(bucket_name)
     placeable_buckets.override_bucket_item(bucket_name)
+    --placeable_buckets.register_and_override_bucket(bucket_name)
+    
+    -- Track it in the library's internal list
+    table.insert(placeable_buckets.buckets, bucket_name)
+end
+function placeable_buckets.register_liquid_wood(source_name, flowing_name, bucket_name, color, node_alpha, alpha, inventory_image, name, groups, bucket_image_suffix)
+    minetest.log('placeable_buckets.register_liquid_wood(source_name='..source_name..', flowing_name='..flowing_name..', bucket_name='..bucket_name..', inventory_image='..inventory_image..', name='..name..', bucket_image_suffix='..bucket_image_suffix..')')
+    --assert(api ~= nil)
+    assert(source_name ~= nil)
+    assert(flowing_name ~= nil)
+    assert(bucket_name ~= nil)
+    assert(color ~= nil)
+    --assert(node_alpha ~= nil)
+    --assert(alpha ~= nil)
+    assert(inventory_image ~= nil)
+    assert(name ~= nil)
+    assert(groups ~= nil)
+    assert(bucket_image_suffix ~= nil)
+    --assert(name_prefix ~= nil)
+    local name_prefix   = 'Wooden '
+    alpha               = alpha      or node_alpha
+    node_alpha          = node_alpha or alpha
+    assert((alpha == nil and node_alpha == nil) or (alpha >= node_alpha), 'bucket liquid should be more opaque than source/flowing liquid')
+    local images        = get_images(inventory_image, color, alpha, bucket_image_suffix)
+    local source_image  = images.source_image
+    local flowing_image = images.flowing_image
+    local bucket_image  = images.bucket_image
+    -- 3. Register via MTG Bucket API
+    wooden_bucket.register_liquid_wood(
+    --api(
+        source_name, -- source
+        --flowing_name,
+        bucket_name, -- itemname
+        bucket_image, -- inventory_image
+        name_prefix .. 'Bucket of ' .. name, -- No hardcoded "Juice" -- name
+        groups or {vessel = 1} -- groups
+    )
+
+    -- 4. Automatic Node-ification
+    placeable_buckets.register_bucket_node(bucket_name)
+    placeable_buckets.override_bucket_item(bucket_name)
+    --placeable_buckets.register_and_override_bucket(bucket_name)
     
     -- Track it in the library's internal list
     table.insert(placeable_buckets.buckets, bucket_name)
 end
 
-function placeable_buckets.register_liquid(modname, color, node_alpha, alpha, item_id, name, groups, base_name_source, base_name_flowing)
-    --minetest.log('placeable_buckets.register_liquid(modname='..modname..', item_id='..item_id..', name='..name..')')
+function placeable_buckets.register_liquid(modname, color, node_alpha, alpha, item_id, name, groups, base_name_source, base_name_flowing, bucket_name, wooden_bucket_name)
+    minetest.log('placeable_buckets.register_liquid(modname='..modname..', item_id='..item_id..', name='..name..', base_name_source='..base_name_source..', base_name_flowing='..base_name_flowing..', bucket_name='..tostring(bucket_name)..', wooden_bucket_name='..tostring(wooden_bucket_name)..')')
     assert(modname ~= nil)
     assert(color ~= nil)
     --assert(node_alpha ~= nil)
@@ -204,22 +252,24 @@ function placeable_buckets.register_liquid(modname, color, node_alpha, alpha, it
     assert(base_name_source ~= nil)
     assert(base_name_flowing ~= nil)
     --assert(minetest.get_modpath('drinks')) -- NOTE do not declare in mod.conf
+    assert(bucket_name ~= nil)
+    assert(wooden_bucket_name ~= nil) -- TODO relax
     
     -- standard naming conventions
     --local source_name     = modname .. ':flowspec_' .. item_id .. '_source'
     --local flowing_name    = modname .. ':flowspec_' .. item_id .. '_flowing'
     local source_name     = modname .. ':' .. item_id .. '_source'
     local flowing_name    = modname .. ':' .. item_id .. '_flowing'
-    local bucket_name     = modname .. ':bucket_'   .. item_id
+    --bucket_name     = bucket_name or (modname .. ':bucket_'   .. item_id)
     local inventory_image = 'drinks_bucket_contents.png'
     placeable_buckets.register_liquid0(source_name, flowing_name, bucket_name, color, node_alpha, alpha, inventory_image, name, groups, '', base_name_source, base_name_flowing)
 
+    -- FIXME when scooping liquids, metal buckets become wooden buckets
     if not ia_util.has_wooden_bucket_redo() then return end
-    local bucket_name     = modname .. ':bucket_wood_'   .. item_id
+    --bucket_name     = wooden_bucket_name or (modname .. ':bucket_wood_'   .. item_id)
     --inventory_image       = inventory_image .. '^wooden_bucket_overlay.png'
-    placeable_buckets.register_liquid1(source_name, flowing_name, bucket_name, color, node_alpha, alpha, inventory_image, name, groups, 'wooden_bucket_overlay.png', 'Wooden ')
+    placeable_buckets.register_liquid_wood(source_name, flowing_name, wooden_bucket_name, color, node_alpha, alpha, inventory_image, name, groups, 'wooden_bucket_overlay.png')
 end
-
 
 
 
@@ -396,3 +446,5 @@ function placeable_buckets.register_drink_vessels(modname, color, item_id, name,
     }
     assert(placeable_buckets.heavy_steel_bottles[modname..':'..jsb_name])
 end
+
+-- TODO recipes for converting between vessel sizes

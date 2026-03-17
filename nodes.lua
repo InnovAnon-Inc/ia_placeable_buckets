@@ -36,7 +36,24 @@ function placeable_buckets.register_bucket_node(itemname)
     end
 
     -- 5. Logic: When dug, it drops the item version of itself
-    node_def.drop = itemname
+    --node_def.drop = itemname -- NOTE testing
+
+    node_def.on_dig = function(pos, node, digger)
+        if not digger then return end
+
+        local inv = digger:get_inventory()
+        local stack = ItemStack(itemname)
+
+        -- Try to put it in the inventory
+        if inv and inv:room_for_item("main", stack) then
+            inv:add_item("main", stack)
+        else
+            -- If inventory is full or restricted, drop it in the world
+            minetest.add_item(pos, stack)
+        end
+
+        minetest.remove_node(pos)
+    end
 
     -- 6. Register as a node using the ":" prefix to keep the name identical
     minetest.register_node(":" .. itemname, node_def)
@@ -44,6 +61,6 @@ function placeable_buckets.register_bucket_node(itemname)
     --log(3, "Converted " .. itemname .. " to a placeable node via table.copy")
 end
 
-for _, name in ipairs(placeable_buckets.buckets) do
-	placeable_buckets.register_bucket_node(name)
-end
+--for _, name in ipairs(placeable_buckets.buckets) do
+--	placeable_buckets.register_bucket_node(name)
+--end
