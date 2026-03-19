@@ -82,7 +82,9 @@ placeable_buckets.hunger_ng_upstreams     = {
     ["default"]              = true,
     ["farming"]              = true,
     --["ketchup"]              = true,
+    ["milker"]               = true,
     ["peeer"]                = true,
+    ["pooper"]               = true,
 }
 placeable_buckets.drinking_glasses        = {}
 placeable_buckets.glass_bottles           = {}
@@ -126,9 +128,11 @@ jsb_water_def.groups        = ia_util.merge_groups(jsb_water_def.groups, { h2o= 
 local jbu_water_def         = minetest.registered_items['bucket:bucket_water']
 jbu_water_def.groups        = ia_util.merge_groups(jbu_water_def.groups, { h2o=12 })
 jbu_water_def.groups        = ia_util.merge_groups(jbu_water_def.groups, { h2o=12 })
-local jbw_water_def         = minetest.registered_items['wooden_bucket:bucket_wood_water']
-jbw_water_def.groups        = ia_util.merge_groups(jbw_water_def.groups, { h2o=12 })
-jbw_water_def.groups        = ia_util.merge_groups(jbw_water_def.groups, { h2o=12 })
+if ia_util.has_wooden_bucket_redo() then
+    local jbw_water_def     = minetest.registered_items['wooden_bucket:bucket_wood_water']
+    jbw_water_def.groups    = ia_util.merge_groups(jbw_water_def.groups, { h2o=12 })
+    jbw_water_def.groups    = ia_util.merge_groups(jbw_water_def.groups, { h2o=12 })
+end
 placeable_buckets.register_drink_vessels(modname, river_water_color, 'river_water', 'River Water',  1, 0,
     'default:river_water_source', 'default:river_water_flowing', 'bucket:bucket_river_water', 'wooden_bucket:bucket_wood_river_water')
 local jcu_river_water_def         = minetest.registered_items[modname..':jcu_river_water']
@@ -143,8 +147,10 @@ jsb_river_water_def.groups        = ia_util.merge_groups(jsb_river_water_def.gro
 local jbu_river_water_def         = minetest.registered_items['bucket:bucket_river_water']
 jbu_river_water_def.groups        = ia_util.merge_groups(jbu_river_water_def.groups, { h2o=12 })
 jbu_river_water_def.groups        = ia_util.merge_groups(jbu_river_water_def.groups, { h2o=12 })
-local jbw_river_water_def         = minetest.registered_items['wooden_bucket:bucket_wood_river_water']
-jbw_river_water_def.groups        = ia_util.merge_groups(jbw_river_water_def.groups, { h2o=12 })
-jbw_river_water_def.groups        = ia_util.merge_groups(jbw_river_water_def.groups, { h2o=12 })
+if ia_util.has_wooden_bucket_redo() then
+    local jbw_river_water_def     = minetest.registered_items['wooden_bucket:bucket_wood_river_water']
+    jbw_river_water_def.groups    = ia_util.merge_groups(jbw_river_water_def.groups, { h2o=12 })
+    jbw_river_water_def.groups    = ia_util.merge_groups(jbw_river_water_def.groups, { h2o=12 })
+end
 placeable_buckets.register_drink_vessels(modname, lava_color,        'lava',        'Lava',        0, -3,
     'default:lava_source',        'default:lava_flowing',        'default:bucket_lava',       nil) -- TODO maybe only steel bottle
